@@ -35,7 +35,7 @@ public class SingleLayerPerceptron {
             println(perceptron.getWeight());
             println("forecast: " + forecast);
             y = scanner.nextDouble();
-            if (scanner.nextBoolean() == false) {
+            if (forecast != y) {
                 perceptron.adjust(y, forecast);
             } else {
                 println("success");
