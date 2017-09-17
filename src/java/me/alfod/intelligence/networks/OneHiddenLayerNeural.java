@@ -1,5 +1,6 @@
 package me.alfod.intelligence.networks;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -31,8 +32,48 @@ public class OneHiddenLayerNeural {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String line;
+        String[] parameters;
+        OneHiddenLayerNeural neural = new OneHiddenLayerNeural();
         while (true) {
-            print("x1,x2,x3");
+            print("x1,x2,x3,,,");
+            while (true) {
+                parameters = scanner.nextLine().split(",");
+                if (parameters.length != neural.X_NUMBER) {
+                    print("x number error, need " + neural.X_NUMBER + " , actual " + parameters.length);
+                } else {
+                    break;
+                }
+            }
+
+            for (int i = 0; i < neural.X_NUMBER; ++i) {
+                neural.x[i] = Integer.valueOf(parameters[i]);
+            }
+            print(neural.forward());
+
+
+            print("y1,y2,y3,,,");
+            while (true) {
+                parameters = scanner.nextLine().split(",");
+                if (parameters.length != neural.Y_NUMBER) {
+                    print("y number error, need " + neural.Y_NUMBER + " , actual " + parameters.length);
+                } else {
+                    break;
+                }
+            }
+
+            double ySum = 0;
+            for (int i = 0; i < neural.Y_NUMBER; ++i) {
+                neural.yActual[i] = Integer.valueOf(parameters[i]);
+                ySum = Math.abs(neural.y[i] - neural.yActual[i]);
+            }
+            if (ySum / neural.Y_NUMBER < 0.1) {
+                print("success !!");
+                break;
+            }
+
+            neural.backward();
+
         }
     }
 
@@ -40,11 +81,15 @@ public class OneHiddenLayerNeural {
         System.out.println(o);
     }
 
+    private static void print(double[] o) {
+        System.out.println(Arrays.toString(o));
+    }
+
     private static double sigmoid(double x) {
         return 1 / Math.pow(Math.E, -x);
     }
 
-    public void forward() {
+    public double[] forward() {
         for (int h = 0; h < alpha.length; ++h) {
             for (int i = 0; i < x.length; ++i) {
                 alpha[h] = x[i] * nu[i][h];
@@ -61,6 +106,15 @@ public class OneHiddenLayerNeural {
         for (int j = 0; j < y.length; ++j) {
             y[j] = sigmoid(beta[j] - theta[j]);
         }
+
+        return y;
+    }
+
+    public static int step(double in) {
+        if (in < 0) {
+            return 0;
+        }
+        return 1;
     }
 
     private void backward() {
@@ -69,7 +123,7 @@ public class OneHiddenLayerNeural {
             g[j] = y[j] * (1 - y[j]) * (yActual[j] - y[j]);
             tau += Math.abs(y[j] - yActual[j]);
         }
-        tau = (tau / Y_NUMBER) * 0.2;
+        tau = (tau / Y_NUMBER);
 
         for (int j = 0; j < Y_NUMBER; ++j) {
             for (int h = 0; h < HIDDEN_NODE_NUMBER; ++h) {
@@ -100,7 +154,7 @@ public class OneHiddenLayerNeural {
 
     private void initDoubleArray(double[][]... array) {
         for (int j = 0; j < array.length; ++j) {
-            for (int k = 0; k < array[j][k].length; ++k) {
+            for (int k = 0; k < array[j].length; ++k) {
                 for (int i = 0; i < array[j][k].length; ++i) {
                     array[j][k][i] = Math.random();
                 }
