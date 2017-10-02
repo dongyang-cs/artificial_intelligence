@@ -31,8 +31,68 @@ public class OneHiddenLayerNeural {
     }
 
     public static void main(String[] args) {
+        train();
+    }
+
+    private static void print(Object o) {
+        System.out.println(o);
+    }
+
+    private static void print(double[] o) {
+        System.out.println(Arrays.toString(o));
+    }
+
+    private static double sigmoid(double x) {
+        return 1 / (1 + Math.pow(Math.E, -x));
+    }
+
+    public static double step(double in) {
+        if (in < 0.5) {
+            return 0;
+        }
+        return 1;
+    }
+
+    private static void train() {
+        OneHiddenLayerNeural neural = new OneHiddenLayerNeural();
+        double[][] x = new double[][]{{0, 0}, {1, 1}, {1, 0}, {0, 1}};
+        double[] y = new double[]{0.49, 0.49, 0.51, 0.51};
+
+        boolean trained;
+        while (true) {
+            trained = true;
+            for (int i = 0; i < 4; ++i) {
+                neural.x = x[i];
+                if (Math.abs(step(neural.forward()[0]) - y[i]) > 0.00001) {
+                    trained = false;
+                    trainSingle(neural, x[i], y[i]);
+                }
+            }
+            if (trained) {
+                break;
+            }
+        }
+        scanner();
+    }
+
+    private static void trainSingle(OneHiddenLayerNeural neural, double[] x, double y) {
+        double neuralY;
+        double originY;
+        while (true) {
+            neural.x = x;
+            neural.yActual[0] = y;
+            originY=neural.forward()[0];
+            neuralY=step(originY);
+            if (Math.abs(neuralY- y) > 0.0001) {
+                neural.backward();
+            } else {
+                break;
+            }
+        }
+    }
+
+    private static void scanner() {
         Scanner scanner = new Scanner(System.in);
-        String line;
         String[] parameters;
         OneHiddenLayerNeural neural = new OneHiddenLayerNeural();
         while (true) {
@@ -65,42 +125,29 @@ public class OneHiddenLayerNeural {
             double ySum = 0;
             for (int i = 0; i < neural.Y_NUMBER; ++i) {
                 neural.yActual[i] = Integer.valueOf(parameters[i]);
-                ySum = Math.abs(neural.y[i] - neural.yActual[i]);
+                ySum += Math.abs(neural.yActual[i] - step(neural.y[i]));
             }
-            if (ySum / neural.Y_NUMBER < 0.1) {
-                print("success !!");
-                break;
+            if (ySum == 0) {
+                print("success ");
+            } else {
+                neural.backward();
             }
-
-            neural.backward();
 
         }
-    }
-
-    private static void print(Object o) {
-        System.out.println(o);
-    }
-
-    private static void print(double[] o) {
-        System.out.println(Arrays.toString(o));
-    }
-
-    private static double sigmoid(double x) {
-        return 1 / Math.pow(Math.E, -x);
     }
 
     public double[] forward() {
         for (int h = 0; h < alpha.length; ++h) {
             for (int i = 0; i < x.length; ++i) {
-                alpha[h] = x[i] * nu[i][h];
+                alpha[h] += x[i] * nu[i][h];
             }
         }
         for (int h = 0; h < b.length; ++h) {
             b[h] = sigmoid(alpha[h] - gamma[h]);
         }
         for (int j = 0; j < beta.length; ++j) {
-            for (int h = 0; h < beta.length; ++h) {
-                beta[j] = b[h] * omega[h][j];
+            for (int h = 0; h < b.length; ++h) {
+                beta[j] += b[h] * omega[h][j];
             }
         }
         for (int j = 0; j < y.length; ++j) {
@@ -110,20 +157,11 @@ public class OneHiddenLayerNeural {
         return y;
     }
 
-    public static int step(double in) {
-        if (in < 0) {
-            return 0;
-        }
-        return 1;
-    }
-
     private void backward() {
-        tau = 0;
         for (int j = 0; j < Y_NUMBER; ++j) {
             g[j] = y[j] * (1 - y[j]) * (yActual[j] - y[j]);
-            tau += Math.abs(y[j] - yActual[j]);
         }
-        tau = (tau / Y_NUMBER);
+        tau = 0.001;
 
         for (int j = 0; j < Y_NUMBER; ++j) {
             for (int h = 0; h < HIDDEN_NODE_NUMBER; ++h) {
@@ -131,7 +169,7 @@ public class OneHiddenLayerNeural {
             }
         }
         for (int j = 0; j < Y_NUMBER; ++j) {
-            theta[j] += -g[j] * tau;
+            theta[j] -= g[j] * tau;
         }
         double wg;
         for (int h = 0; h < HIDDEN_NODE_NUMBER; ++h) {
@@ -143,7 +181,7 @@ public class OneHiddenLayerNeural {
         }
 
         for (int h = 0; h < HIDDEN_NODE_NUMBER; ++h) {
-            gamma[h] += -e[h] * tau;
+            gamma[h] -= e[h] * tau;
         }
         for (int i = 0; i < X_NUMBER; ++i) {
             for (int h = 0; h < HIDDEN_NODE_NUMBER; ++h) {
@@ -154,18 +192,14 @@ public class OneHiddenLayerNeural {
 
     private void initDoubleArray(double[][]... array) {
         for (int j = 0; j < array.length; ++j) {
-            for (int k = 0; k < array[j].length; ++k) {
-                for (int i = 0; i < array[j][k].length; ++i) {
-                    array[j][k][i] = Math.random();
-                }
-            }
+            initDoubleArray(array[j]);
         }
     }
 
     private void initDoubleArray(double[]... array) {
         for (int j = 0; j < array.length; ++j) {
             for (int i = 0; i < array[j].length; ++i) {
-                array[j][i] = Math.random();
+                array[j][i] = (Math.random() - 0.5) * 2;
             }
         }
     }
