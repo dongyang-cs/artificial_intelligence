@@ -191,8 +191,8 @@ public class OneHiddenLayerNeural {
     }
 
     private void initDoubleArray(double[][]... array) {
-        for (int j = 0; j < array.length; ++j) {
-            initDoubleArray(array[j]);
+        for (double[][] anArray : array) {
+            initDoubleArray(anArray);
         }
     }
 
