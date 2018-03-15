@@ -1,4 +1,4 @@
-import me.alfod.intelligence.networks.OneHiddenLayerNeural;
+import me.alfod.intelligence.networks.TwoHiddenLayerNeural;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class OneHiddenTest {
 
     public static void main(String[] args) {
-        OneHiddenLayerNeural neural = new OneHiddenLayerNeural();
+        TwoHiddenLayerNeural neural = new TwoHiddenLayerNeural();
         double[][] x = new double[][]{{0, 0}, {1, 1}, {1, 0}, {0, 1}};
         double[][] y = new double[][]{{0.4}, {0.4}, {0.6}, {0.6}};
         while (true) {
@@ -28,7 +28,7 @@ public class OneHiddenTest {
         }
     }
 
-    private static void trainSingle(OneHiddenLayerNeural neural, double[] x, double[] y) {
+    private static void trainSingle(TwoHiddenLayerNeural neural, double[] x, double[] y) {
         while (true) {
             if (valid(neural, x, y)) {
                 return;
@@ -38,7 +38,7 @@ public class OneHiddenTest {
         }
     }
 
-    private static void scanner(OneHiddenLayerNeural neural) {
+    private static void scanner(TwoHiddenLayerNeural neural) {
         Scanner scanner = new Scanner(System.in);
         String[] parameters;
         while (true) {
@@ -90,7 +90,7 @@ public class OneHiddenTest {
         System.out.println(Arrays.toString(o));
     }
 
-    private static boolean valid(OneHiddenLayerNeural neural, double[] x, double[] y) {
+    private static boolean valid(TwoHiddenLayerNeural neural, double[] x, double[] y) {
         return Math.abs(neural.forward(x)[0] - y[0]) < 0.01;
     }
 
