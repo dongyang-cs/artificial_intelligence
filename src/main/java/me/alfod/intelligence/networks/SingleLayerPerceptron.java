@@ -20,40 +20,6 @@ public class SingleLayerPerceptron {
         x[0] = -1;
     }
 
-    public static void main(String[] args) {
-        SingleLayerPerceptron perceptron = new SingleLayerPerceptron();
-        Scanner scanner = new Scanner(System.in);
-        int forecast;
-        double y;
-        while (true) {
-            println();
-            println("please enter you number in format: x1 x2 y");
-            for (int i = 1; i < perceptron.getX().length; i++) {
-                perceptron.setX(i, scanner.nextDouble());
-            }
-            forecast = step(perceptron.calculate());
-            println(perceptron.getWeight());
-            println("forecast: " + forecast);
-            y = scanner.nextDouble();
-            if (forecast != y) {
-                perceptron.adjust(y, forecast);
-            } else {
-                println("success");
-            }
-        }
-    }
-
-    public static void println(Object o) {
-        System.out.println(o);
-    }
-
-    public static void println(double[] o) {
-        System.out.println(Arrays.toString(o));
-    }
-
-    public static void println() {
-        System.out.println();
-    }
 
     public static int step(double in) {
         if (in < 0) {
