@@ -8,7 +8,7 @@ public class leetcode {
     @Test
     public void test() {
         int[] nums1 = new int[]{1, 2, 5, 8, 11};
-        int[] nums2 = new int[]{7, 9, 10, 14};
+        int[] nums2 = new int[]{7, 9, 10};
         double x = findMedianSortedArrays(nums1, nums2);
         System.out.println(x);
     }
@@ -23,8 +23,11 @@ public class leetcode {
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
 
         final int sumLength = nums1.length + nums2.length;
-        final int halfSumLength = (sumLength + 1) / 2;
+        int halfSumLength = (sumLength) / 2;
         final boolean isEven = sumLength % 2 == 0;
+        if (!isEven) {
+            halfSumLength = (sumLength+1) / 2;
+        }
         final int nums1Last = nums1[nums1.length - 1], nums2Last = nums2[nums2.length - 1];
         final int nums1First = nums1[0], nums2First = nums2[0];
 
@@ -50,12 +53,12 @@ public class leetcode {
                 index2 = findIndex(nums2, n);
                 if (index1 + index2 < halfSumLength) {
                     index1r[0] = index1;
-                    index2 = (index2r[1] + index2) / 2;
-                    n = nums2[index2 - 1];
+                    index2 = (index2r[1] + index2+1) / 2;
+                    n = nums2[index2-1];
                 } else if (index1 + index2 > halfSumLength) {
                     index1r[1] = index1;
-                    index2 = (index2r[0] + index2) / 2;
-                    n = nums2[index2 - 1];
+                    index2 = (index2r[0] + index2+1) / 2;
+                    n = nums2[index2-1];
                 } else {
                     System.out.println(isNum1);
                     if (isEven) {
@@ -76,12 +79,12 @@ public class leetcode {
                 index1 = findIndex(nums1, n);
                 if (index1 + index2 < halfSumLength) {
                     index2r[0] = index2;
-                    index1 = (index1r[1] + index1) / 2;
-                    n = nums1[index1 - 1];
+                    index1 = (index1r[1] + index1+1) / 2;
+                    n = nums1[index1-1];
                 } else if (index1 + index2 > halfSumLength) {
                     index2r[1] = index2;
-                    index1 = (index1r[0] + index1) / 2;
-                    n = nums1[index1 - 1];
+                    index1 = (index1r[0] + index1+1) / 2;
+                    n = nums1[index1-1];
                 } else {
                     System.out.println(isNum1);
                     if (isEven) {
