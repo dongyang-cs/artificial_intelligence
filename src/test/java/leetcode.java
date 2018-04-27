@@ -16,18 +16,23 @@ public class leetcode {
     @Test
     public void findIndexTest() {
         int[] nums1 = new int[]{1, 2, 5, 8, 11};
-        int index = findIndex(nums1, 6);
+        int index = findNotGreaterNum(nums1, 3, new int[2]);
         System.out.println(index);
+    }
+
+    @Test
+    public void testArray() {
+        int[] s = new int[]{1, 2, 3, 4};
+        int[] s1 = s;
+        s1[1] = 111;
+        System.out.println(s[1]);
     }
 
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
 
         final int sumLength = nums1.length + nums2.length;
-        int halfSumLength = (sumLength) / 2;
+        int halfSumLength = (sumLength + 1) / 2;
         final boolean isEven = sumLength % 2 == 0;
-        if (!isEven) {
-            halfSumLength = (sumLength+1) / 2;
-        }
         final int nums1Last = nums1[nums1.length - 1], nums2Last = nums2[nums2.length - 1];
         final int nums1First = nums1[0], nums2First = nums2[0];
 
@@ -40,68 +45,54 @@ public class leetcode {
         }
 
 
-        int index1 = nums1.length / 2;
-        int index2 = nums2.length / 2;
-        int n = nums1[index1];
-        int index;
-        int[] index1r = new int[]{0, nums1.length - 1}, index2r = new int[]{0, nums2.length - 1};
-        boolean isNum1 = true;
-        int s1 = 0, s2 = 0;
+        int notGreater1 = nums1.length / 2;
+        int notGreater2 = nums2.length / 2;
+        int num = nums1[notGreater1];
+        int notGreaterSum;
+        int[] range1 = new int[]{0, nums1.length}, range2 = new int[]{0, nums2.length};
         while (true) {
+            notGreater2 = findNotGreaterNum(nums2, num, range2);
+            notGreaterSum = notGreater1 + notGreater2;
+            if (notGreaterSum < halfSumLength) {
+                range1[0] = notGreater1;
+                range2[0] = notGreater2;
+                notGreater1 = (range1[1] + notGreater1) / 2;
+            }
+            if (notGreaterSum > halfSumLength) {
+                range1[1] = notGreater1;
+                range2[1] = notGreater2;
+                notGreater1 = (range1[0] + notGreater1) / 2;
+            }
 
-            if (isNum1) {
-                index2 = findIndex(nums2, n);
-                if (index1 + index2 < halfSumLength) {
-                    index1r[0] = index1;
-                    index2 = (index2r[1] + index2+1) / 2;
-                    n = nums2[index2-1];
-                } else if (index1 + index2 > halfSumLength) {
-                    index1r[1] = index1;
-                    index2 = (index2r[0] + index2+1) / 2;
-                    n = nums2[index2-1];
-                } else {
-                    System.out.println(isNum1);
-                    if (isEven) {
-                        if (index1 == 0) {
-                            return (double) (n + nums2[index2]) / 2;
-                        } else {
-                            s1 = nums1[index1];
-                            s2 = nums2[index2];
-                            int value = s1 > s2 ? s2 : s1;
-                            return (double) (n + value) / 2;
-                        }
+            if (notGreaterSum == halfSumLength) {
+                num = nums1[notGreater1 - 1];
+                if (isEven) {
+                    if (notGreater2 == 0) {
+                        return (double) (num + nums1[notGreater1]) / 2;
                     } else {
-                        return (double) n;
+                        int s1 = nums1[notGreater1];
+                        int s2 = nums2[notGreater2];
+                        int value = s1 > s2 ? s2 : s1;
+                        return (double) (num + value) / 2;
                     }
-                }
-
-            } else {
-                index1 = findIndex(nums1, n);
-                if (index1 + index2 < halfSumLength) {
-                    index2r[0] = index2;
-                    index1 = (index1r[1] + index1+1) / 2;
-                    n = nums1[index1-1];
-                } else if (index1 + index2 > halfSumLength) {
-                    index2r[1] = index2;
-                    index1 = (index1r[0] + index1+1) / 2;
-                    n = nums1[index1-1];
                 } else {
-                    System.out.println(isNum1);
-                    if (isEven) {
-                        if (index1 == 0) {
-                            return (double) (n + nums2[index2]) / 2;
-                        } else {
-                            s1 = nums1[index1];
-                            s2 = nums2[index2];
-                            int value = s1 > s2 ? s2 : s1;
-                            return (double) (n + value) / 2;
-                        }
-                    } else {
-                        return (double) n;
-                    }
+                    return (double) num;
                 }
             }
-            isNum1 = !isNum1;
+
+            if (range1[1] - range1[0] < 3) {
+                int[] range = range1;
+                range1 = range2;
+                range2 = range;
+
+                int[] nums = nums1;
+                nums1 = nums2;
+                nums2 = nums;
+
+                int notGreater = notGreater1;
+                notGreater1 = notGreater2;
+                notGreater2 = notGreater;
+            }
         }
 
 
@@ -133,26 +124,37 @@ public class leetcode {
     }
 
 
-    public int findIndex(int[] nums, final int n) {
-        int i = nums.length / 2;
-        int temN;
-        int[] range = new int[]{0, nums.length};
+    private int findNotGreaterNum(int[] nums, final int n, int[] range) {
+
         if (n < nums[0]) {
             return 0;
         }
         if (n >= nums[nums.length - 1]) {
             return nums.length;
         }
+        int index = nums.length / 2;
+        int small, big;
+
+        if (range[0] == 0 && range[1] == 0) {
+            range[0] = 0;
+            range[1] = nums.length;
+        }
+        if (range[1] - range[0] < 2) {
+            return nums[range[0]];
+        }
         while (true) {
-            temN = nums[i];
-            if (n == temN || (n > temN && n < nums[i + 1])) {
-                return i + 1;
-            } else if (n > temN) {
-                range[0] = i;
-                i = (i + range[1]) / 2;
+            small = nums[index];
+            big = nums[index + 1];
+            if (small <= n && big > n) {
+                return index + 1;
+            } else if (big == n) {
+                return index + 2;
+            } else if (small > n) {
+                range[1] = index;
+                index = (index + range[0]) / 2;
             } else {
-                range[1] = i;
-                i = (i + range[0]) / 2;
+                range[0] = index;
+                index = (index + range[1]) / 2;
             }
         }
     }
