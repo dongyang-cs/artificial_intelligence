@@ -3,6 +3,8 @@ import me.alfod.intelligence.networks.TwoHiddenLayerNeural;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static me.alfod.intelligence.networks.SingleLayerPerceptron.step;
+
 /**
  * Created by Arvin Alfod on 2017/10/10.
  */
@@ -58,26 +60,26 @@ public class OneHiddenTest {
             print(neural.forward());
 
 
-//            print("y1,y2,y3,,,");
-//            while (true) {
-//                parameters = scanner.nextLine().split(",");
-//                if (parameters.length != neural.Y_NUMBER) {
-//                    print("y number error, need " + neural.Y_NUMBER + " , actual " + parameters.length);
-//                } else {
-//                    break;
-//                }
-//            }
-//
-//            double ySum = 0;
-//            for (int i = 0; i < neural.Y_NUMBER; ++i) {
-//                neural.yActual[i] = Double.valueOf(parameters[i]);
-//                ySum += Math.abs(neural.yActual[i] - step(neural.y[i]));
-//            }
-//            if (ySum == 0) {
-//                print("success ");
-//            } else {
-//                neural.backward();
-//            }
+            print("y1,y2,y3,,,");
+            while (true) {
+                parameters = scanner.nextLine().split(",");
+                if (parameters.length != neural.Y_NUMBER) {
+                    print("y number error, need " + neural.Y_NUMBER + " , actual " + parameters.length);
+                } else {
+                    break;
+                }
+            }
+
+            double ySum = 0;
+            for (int i = 0; i < neural.Y_NUMBER; ++i) {
+                neural.yActual[i] = Double.valueOf(parameters[i]);
+                ySum += Math.abs(neural.yActual[i] - step(neural.y[i]));
+            }
+            if (ySum == 0) {
+                print("success ");
+            } else {
+                neural.backward();
+            }
 
         }
     }
